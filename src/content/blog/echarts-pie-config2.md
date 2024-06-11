@@ -3,7 +3,7 @@ author: Huang Chao
 pubDatetime: 2024-02-12T15:58:53Z
 modDatetime: 2023-02-12T15:59:53Z
 title: "echarts 饼图一些特殊动画效果"
-featured: false
+featured: true
 tags:
   - echarts
 description: echarts 饼图一些特殊动画效果.
