@@ -251,6 +251,4 @@ export default RingChart;
 
 ## 效果图
 
-[//]: # "![let_error](../../assets/images/es6/let_error.jpeg![pie-demo-1.png](..%2F..%2Fassets%2Fimages%2Fpie-demo-1.png))"
-
 ![pie-demo-1.png](../../assets/images/pie-demo-1.png)
