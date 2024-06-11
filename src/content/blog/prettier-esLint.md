@@ -55,7 +55,7 @@ description: Prettier、ESLint配置及注释.
 }
 ```
 
-### ESLint部分
+## ESLint部分
 
 ```json lines
 {
