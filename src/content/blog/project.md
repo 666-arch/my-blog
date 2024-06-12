@@ -5,7 +5,7 @@ modDatetime: 2023-12-06T13:05:56.066Z
 title: "真实项目截图（部分）"
 featured: false
 tags:
-  - javascript
+  - project
 description: 商业机密非授权无法全部公开.
 ---
 
@@ -13,3 +13,7 @@ description: 商业机密非授权无法全部公开.
 
 ![project-1.png](../../assets/images/project-1.png)
 ![project-1-1.png](../../assets/images/project-1-1.png)
+
+## 项目二
+
+![project-2.png](../../assets/images/project-2.png)
