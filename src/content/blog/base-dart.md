@@ -47,7 +47,7 @@ void main(List<String> args) {
 
 class Person {
   final String name;
-  const Person(this.name);
+  const Person(this.name);****
 }
 ```
 
@@ -78,3 +78,5 @@ print(message2);
 ```
 
 ##
+
+const uniqueData = Array.from(new Map(data.map(item => [item.categoryName, item])).values());
