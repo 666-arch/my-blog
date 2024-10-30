@@ -39,3 +39,46 @@ audio元件以此来在页面中播报对应的语音内容。
 ## 接口鉴权
 
 在握手阶段，请求方需要对请求进行签名，服务端通过前面来校验请求的合法性
+|参数|类型|说明|是否必须|
+|:---:|:---:|:---:|:---:|
+|host|string|请求主机|是|
+|date|string|当前时间戳，RFC123格式|是|
+|authorization|string|使用base64编码签名相关的信息|是|
+
+## 如何二次集成
+
+> 注意：需要提前获取到官方提供的鉴权密钥（根据需要选择套餐购买）
+
+定义一个 `DiscernClass` 公共类
+
+```ts
+import Crypto from "crypto-js";
+import EventEmitter from "events";
+
+interface IAIOptions {
+  APPID: string;
+  APIKEY: string;
+  APISECRET: string;
+}
+
+export default class DiscernClass extends EventEmitter {
+  private APP_ID: string;
+  private API_KEY: string;
+  private API_SECRET: string;
+  private seconds: number = 0;
+  private ws?: WebSocket;
+  private recorder?: RecorderManager;
+  private countdownInterval?: NodeJS.Timeout;
+  private resultText: string = ""; //识别结果（根据需要是否暴露）
+  constructor(options: IAIOptions) {
+    super();
+    this.APP_ID = options.APPID;
+    this.API_KEY = options.APIKEY;
+    this.API_SECRET = options.APISECRET;
+    this.recorder = new RecorderManager("/kfspeech/discern"); //单独配置到项目下，不然可能会出现空引用情况
+  }
+  private getWebSocketUrl(): string {
+    const url = "xxx"; //具体见文档
+  }
+}
+```
