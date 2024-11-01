@@ -19,12 +19,13 @@ description: 实现浏览器语音交互（语音转文本）（文本转音频�
 &nbsp;&nbsp;&nbsp;&nbsp;语音合成：主要是将文字消息转换为音频信息，具体可以表现为通过浏览器audio原件，将音频发送至
 audio元件以此来在页面中播报对应的语音内容。
 
-&nbsp;&nbsp;&nbsp;&nbsp;该语音能力是通过 `Websocket API` 的方式提供给开发者一个通用的接口。`Websocket API` 具备流式传输的能力，适用于需要流式数据传输
+&nbsp;&nbsp;&nbsp;&nbsp;该语音能力是通过 `Websocket API` 的方式提供给开发者一个通用的接口。`Websocket API`
+具备流式传输的能力，适用于需要流式数据传输
 的AI服务场景，比如边说话边识别，相较于SDK，API具有轻量级，跨语言的特点。相较于 `HTTP API`，`Websocket API` 协议具有原生支持跨域的优势。
 
 如下图：
 
-![xfXmind.png](../../assets/images/xfXmind.png)
+![xfXming.png](../../assets/images/xfXmind.png)
 
 # 语音识别
 
@@ -32,7 +33,7 @@ audio元件以此来在页面中播报对应的语音内容。
 
 接口调用流程步骤如下：
 
-- 通过接口密钥基于 `hmac-sha256` 计算签名，向服务器端发送Websockt协议握手请求
+- 通过接口密钥基于 `hmac-sha256` 计算签名，向服务器端发送Websocket协议握手请求
 - 握手成功后，客户端通过websocket连接同时上传和接收数据。数据上传完毕，客户端需要上传以此数据结束标识
 - 接收到服务器端的结果全部返回标识后断开Websocket连接
 
@@ -77,8 +78,21 @@ export default class DiscernClass extends EventEmitter {
     this.API_SECRET = options.APISECRET;
     this.recorder = new RecorderManager("/kfspeech/discern"); //单独配置到项目下，不然可能会出现空引用情况
   }
+
   private getWebSocketUrl(): string {
     const url = "xxx"; //具体见文档
+    const host = "xxx";
+    const apikey = this.API_KEY;
+    const apiSecret = this.API_SECRET;
+    const date = new Date().toUTCString();
+    const algorithm = "hmac-sha256";
+    const headers = "host date request-line";
+    const signatureOrigin = `host: ${host}\ndate: ${date}\nGET /v2/iat HTTP/1.1`;
+    const signatureSha = CryptoJS.HmacSHA256(signatureOrigin, apiSecret);
+    const signature = CryptoJS.enc.Base64.stringify(signatureSha);
+    const authorizationOrigin = `api_key="${apiKey}", algorithm="${algorithm}", headers="${headers}", signature="${signature}"`;
+    const authorization = btoa(authorizationOrigin);
+    return `${url}?authorization=${authorization}&date=${date}&host=${host}`;
   }
 }
 ```
