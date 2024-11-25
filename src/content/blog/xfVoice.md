@@ -62,6 +62,16 @@ interface IAIOptions {
   APISECRET: string;
 }
 
+/**
+ * @description 语音识别内部类
+ * @param APP 应用ID
+ * @param API_KEY 接口授权 KEY
+ * @param API_SECRET 接口授权密钥 SECRET
+ * @param seconds 录音持续时长（60s）
+ * @param socket
+ * @param rocorder 讯飞内置音频类
+ * @param result 识别结果
+ */
 export default class DiscernClass extends EventEmitter {
   private APP_ID: string;
   private API_KEY: string;
@@ -78,21 +88,138 @@ export default class DiscernClass extends EventEmitter {
     this.API_SECRET = options.APISECRET;
     this.recorder = new RecorderManager("/kfspeech/discern"); //单独配置到项目下，不然可能会出现空引用情况
   }
+}
+```
 
-  private getWebSocketUrl(): string {
-    const url = "xxx"; //具体见文档
-    const host = "xxx";
-    const apikey = this.API_KEY;
-    const apiSecret = this.API_SECRET;
-    const date = new Date().toUTCString();
-    const algorithm = "hmac-sha256";
-    const headers = "host date request-line";
-    const signatureOrigin = `host: ${host}\ndate: ${date}\nGET /v2/iat HTTP/1.1`;
-    const signatureSha = CryptoJS.HmacSHA256(signatureOrigin, apiSecret);
-    const signature = CryptoJS.enc.Base64.stringify(signatureSha);
-    const authorizationOrigin = `api_key="${apiKey}", algorithm="${algorithm}", headers="${headers}", signature="${signature}"`;
-    const authorization = btoa(authorizationOrigin);
-    return `${url}?authorization=${authorization}&date=${date}&host=${host}`;
+接口鉴权，会返回一个鉴权好的 `ws url` 根据这个 `url` 发起讯飞 `WebSocket` 请求
+
+```ts
+const getWebSocketUrl = (): string => {
+  const url = XF_DISCERNWSSURL;
+  const host = XF_DISCERNHOST;
+  const apiKey = this.API_KEY;
+  const apiSecret = this.API_SECRET;
+  const date = new Date().toUTCString();
+  const algorithm = "hmac-sha256";
+  const headers = "host date request-line";
+  const signatureOrigin = `host: ${host}\ndate: ${date}\nGET /v2/iat HTTP/1.1`;
+  const signatureSha = CryptoJS.HmacSHA256(signatureOrigin, apiSecret);
+  const signature = CryptoJS.enc.Base64.stringify(signatureSha);
+  const authorizationOrigin = `api_key="${apiKey}", algorithm="${algorithm}", headers="${headers}", signature="${signature}"`;
+  const authorization = btoa(authorizationOrigin);
+  return `${url}?authorization=${authorization}&date=${date}&host=${host}`;
+};
+```
+
+在业务数据流参数中 `audio` 音频内容，需要采用 `base64` 编码格式传递
+
+```ts
+const toBase64 = (buffer: ArrayBuffer): string => {
+  const binary = String.fromCharCode(...new Uint8Array(buffer));
+  return window.btoa(binary);
+};
+```
+
+创建请求，发起 `WebSocket` 请求连接讯飞服务，请求示例参数：
+
+```json
+{
+  "common": {
+    "app_id": "xxx"
+  },
+  "business": {
+    "language": "zh_cn",
+    "domain": "iat",
+    "accent": "mandarin"
+  },
+  "data": {
+    "status": 0,
+    "format": "audio/L16;rate=16000",
+    "encoding": "raw",
+    "audio": "exSI6ICJlbiIsCgkgICAgInBvc2l0aW9uIjogImZhbHNlIgoJf..."
   }
 }
+```
+
+连接方法 `frameSize` 为每一帧音频大小的整数倍，`sampleRate` 表示音频采样率。
+
+```ts
+const connectWebSocket = () => {
+  const url = this.getWebSocketUrl();
+  this.ws = new WebSocket(url);
+  this.ws.onopen = () => {
+    this.recorder?.start({
+      sampleRate: 16000,
+      frameSize: 1280,
+    });
+    const params = {
+      common: {
+        app_id: this.APP_ID,
+      },
+      business: {
+        language: "zh_cn",
+        domain: "iat",
+        accent: "mandarin",
+        vad_eos: 60000, // 静默状态时长(测试最长静默时间为30s)
+        dwa: "wpgs",
+        ptt: 0, //不要识别标点符号
+      },
+      data: {
+        status: 0,
+        format: "audio/L16;rate=16000",
+        encoding: "raw",
+      },
+    };
+    this.ws?.send(JSON.stringify(params));
+  };
+  this.ws.onmessage = e => this.renderResult(e.data as string);
+  this.ws.onclose = () => {
+    this.recorder?.stop();
+    console.log("断开连接");
+    this.emit("closed");
+  };
+  this.ws.onerror = () => {
+    this.recorder?.stop();
+  };
+};
+```
+
+处理请求成功后的收音结果，每次捕获到的数据都会重置上一次捕获到的音频，防止捕获到的音频字符串内容过长
+
+```ts
+const renderResult = (resultData: string) => {
+  try {
+    const jsonData = JSON.parse(resultData);
+    if (jsonData.data && jsonData.data.result) {
+      const data = jsonData.data.result;
+      let str = "";
+      const ws = data.ws;
+      for (let i = 0; i < ws.length; i++) {
+        str += ws[i].cw[0].w;
+      }
+      this.text = str;
+    }
+    if (jsonData.code === 0 && jsonData.data.status === 2) {
+      this.ws?.close();
+    }
+    if (jsonData.code !== 0) {
+      this.ws?.close();
+    }
+  } catch (error) {
+    console.error("发送错误", error);
+  }
+};
+```
+
+这里通过 `Event` 事件的 `emit` 向外（发射）出一个事件，调用者通过监听器（listener）来响应这个事件。
+也可以称为事件驱动。允许创建和处理自定义事件
+
+```
+  set text(value) {
+    this.resultText = value;
+    this.emit('change', value);
+  }
+  get text() {
+    return this.resultText;
+  }
 ```
