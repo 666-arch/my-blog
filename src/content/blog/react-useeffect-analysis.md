@@ -5,7 +5,7 @@ modDatetime: 2024-04-05T13:05:56.066Z
 title: "react hooks useEffect 使用浅析"
 featured: true
 tags:
-  - reactjs
+  - react
 description: react hooks uesEffect 解析.
 ---
 
