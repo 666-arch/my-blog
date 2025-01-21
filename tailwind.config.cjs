@@ -39,6 +39,7 @@ module.exports = {
           fill: withOpacity("--color-accent"),
         },
       },
+
       borderColor: {
         skin: {
           line: withOpacity("--color-border"),
