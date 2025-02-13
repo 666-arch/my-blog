@@ -111,3 +111,61 @@ function defineReactive(obj, key) {
 - 收集依赖 定义一个数组用来存储 Watcher 实例，需要修改的目标实例指向当前的 target
 - 数据变更，触发 setter
 - 派发更新，属性值的变化 调用 notify() 通知所有 Watcher 去执行 Update()
+
+### 处理数组问题
+
+> `Object.defineProperty()` 无法监听数组数组索引的变化，Vue通过重写数组方法实现响应式
+
+- 通过替换数组原型链的方式
+
+```js
+const arrayProto = Array.prototype;
+const arrayMethods = Object.create(arrayProto);
+
+["push", "pop", "shift", "unshift", "splice", "sort", "reverse"].forEach(
+  method => {
+    const original = arrayProto[method];
+    Object.defineProperty(arrayMethods, method, {
+      value(...args) {
+        const result = original.apply(this, args);
+        console.log("数组变化，触发更新");
+        dep.notify(); // 通知依赖更新
+        return result;
+      },
+    });
+  }
+);
+
+// 替换数组的原型链
+function observeArray(arr) {
+  arr.__proto__ = arrayMethods;
+  arr.forEach(item => observe(item)); // 递归观察数组元素
+}
+```
+
+## 那么 Vue3 如何做的呢？
+
+在这之前 需要了解 `Object.defineProperty()`的局限性
+
+- 对象局限性：无法解决对象属性的新增、删除
+
+```js
+// Vue 2 中，以下操作不会触发响应式更新
+this.obj.newProp = 123; // 新增属性无效
+delete this.obj.existingProp; // 删除属性无效
+// 必须使用 Vue.set或delete
+```
+
+- 数组的局限性
+
+```js
+// Vue 2 无法检测以下操作
+this.arr[0] = 1; // 通过索引修改元素
+this.arr.length = 0; // 修改数组长度
+//通过重写数组的的7个方法（push/pop等，但是仍有局限性）
+```
+
+- 性能问题
+  - 针对处理复杂对象属性时，需要逐个的劫持 getter、setter，大型对象初始化慢
+  - 过多的递归容易导致递归异常，栈溢出问题
+  - 每次访问深层次属性，都会触发 getter、setter
