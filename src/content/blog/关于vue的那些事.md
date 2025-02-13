@@ -167,5 +167,55 @@ this.arr.length = 0; // 修改数组长度
 
 - 性能问题
   - 针对处理复杂对象属性时，需要逐个的劫持 getter、setter，大型对象初始化慢
-  - 过多的递归容易导致递归异常，栈溢出问题
-  - 每次访问深层次属性，都会触发 getter、setter
+  - 每次访问深层次属性，都会进行全量递归
+
+### Vue3 的 Proxy 如何解决问题的？
+
+> Proxy 属于ES6特性，可以拦截对象的所有操作（属性访问、新增、删除等），提供更全面的响应式
+
+- 支持动态属性的新增、删除等操作（无需借助API，直接操作属性即可触发）
+
+```js
+const obj = { a: 1 };
+const p = new Proxy(obj, {
+  get(target, key) {}, // 拦截读取
+  set(target, key, value) {}, // 拦截设置（包括新增属性）
+  deleteProperty(target, key) {}, // 拦截删除
+});
+p.b = 2; // 新增属性自动触发响应式
+delete p.a; // 删除属性自动触发响应式
+```
+
+- 完整的数组支持（无需重写数组方法，直接操作即可更新）
+
+```js
+const arr = [1, 2, 3];
+const proxyArr = new Proxy(arr, {
+  set(target, key, value) {
+    // 拦截索引修改，length 变化
+    target[key] = value;
+    triggerUpdate(); // 触发更新
+    return true;
+  },
+});
+proxyArr[0] = 6; // 直接触发更新
+proxyArr.length = 0; // 直接触发更新
+```
+
+- 性能优化（按需劫持）
+
+```js
+const obj = { a: { b: { c: 1 } } };
+// 仅当访问 obj.a.b.c时， 才会递归劫持深层属性，不会针对每个属性设置单独的劫持操作
+// 因为 Proxy 代理的是一整个对象，减少了内存的占用
+```
+
+- 更强大的劫持能力（Proxy 支持 13种 拦截操作）
+
+get/set/deleteProperty（属性的读取、设置、删除）
+
+## 总结
+
+- 通过 Proxy 解决了 Vue2 中 属性的新增、删除以及数组索引无法直接更新响应的问题
+- 在性能方面避免了初始化全量递归，而是按需劫持，无需重写数组方法
+- 简化 API 设计（无需使用 Vue.set、Vue.delete）
