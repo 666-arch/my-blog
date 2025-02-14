@@ -38,13 +38,16 @@ console.log("count", fun()); // 2
 
 - 函数柯里化
 - 实现函数模块化
+  - `count` 是一个创建于 `fun` 函数作用域内的变量
+  - 通过在内部处理 `count` 的读取和设置，外部无法直接调用到 count
+  - 通过暴露公共方法去供外部读取
 
 ```js
 function fun() {
   let count = 0;
   return {
     get() {
-      return count;
+      return count; // 私有变量，外部无法访问
     },
     set() {
       count += 1;
@@ -55,3 +58,7 @@ let newFun = fun();
 newFun.set();
 console.log("result", newFun.get());
 ```
+
+### 注意事项
+
+> 如果闭包长期存在，会容易导致内存泄露，外部变量会被永远携带，可以通过赋值 null 的方式 释放闭包
