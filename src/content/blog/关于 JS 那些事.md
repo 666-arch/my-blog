@@ -122,8 +122,6 @@ Promise.resolve().then(() => {
 - 检查宏任务队列中是否有新的任务，如果有，只处理一个
 - 循环往复，直到队列任务全部清空
 
-## Promise
-
 ## JS 如何构造一个一百个全为 0 的数组
 
 - 通过 Array.fill
@@ -133,4 +131,52 @@ Promise.resolve().then(() => {
 new Array(100).fill(0);
 ```
 
-##
+## ES6中必须要知道的？
+
+### let、const、var 区别？
+
+- var 的变量提升
+
+首先 这三个都是可以去定义一个任意类型的变量
+`var` 其实是 Javascript 的一个 `bug`，在定义变量时，可以在不初始化赋值的情况下直接使用并且浏览器只会警告可能存在 undefined 情况，不会直接告知开发者并且抛出异常
+这就是 `变量提升`
+
+```js
+console.log(a); // undefined
+var a = 10;
+```
+
+- var 存在 `函数作用域` 或者 `全局作用域`
+
+`if` 块外部 仍然可以访问 x 变量，显然不妥。
+
+```js
+function fun() {
+  if (true) {
+    var x = 10;
+  }
+  console.log(x); // 10
+}
+fun();
+```
+
+- `let`，`const` 它们都具有 `块级作用域`。
+
+一个是作为变量存储、一个是作为常量存储，他们的出现就是为了解决 `var` 带来 bug
+
+所谓变量 就是在进行初始化赋值后，可以变化修改的值
+
+所谓常量 就是一旦完成初始化赋值后，无法轻易的修改值（但存在特殊情况）
+
+```js
+function fun() {
+  if (true) {
+    const x = 10;
+    let y = 20;
+  }
+  console.log(x); // 报错：x is not defined
+  console.log(y); // 报错：y is not defined
+}
+
+fun();
+```
