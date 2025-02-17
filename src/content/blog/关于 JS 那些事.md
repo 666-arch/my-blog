@@ -22,11 +22,14 @@ description: "JS碎片化"
 ```js
 function x() {
   let count = 0;
+
   function y() {
     return (count += 1);
   }
+
   return y;
 }
+
 let fun = x();
 console.log("count", fun()); // 1
 console.log("count", fun()); // 2
@@ -54,6 +57,7 @@ function fun() {
     },
   };
 }
+
 let newFun = fun();
 newFun.set();
 console.log("result", newFun.get());
@@ -138,7 +142,8 @@ new Array(100).fill(0);
 - var 的变量提升
 
 首先 这三个都是可以去定义一个任意类型的变量
-`var` 其实是 Javascript 的一个 `bug`，在定义变量时，可以在不初始化赋值的情况下直接使用并且浏览器只会警告可能存在 undefined 情况，不会直接告知开发者并且抛出异常
+`var` 其实是 Javascript 的一个 `bug`，在定义变量时，可以在不初始化赋值的情况下直接使用并且浏览器只会警告可能存在 undefined
+情况，不会直接告知开发者并且抛出异常
 这就是 `变量提升`
 
 ```js
@@ -157,6 +162,7 @@ function fun() {
   }
   console.log(x); // 10
 }
+
 fun();
 ```
 
@@ -179,4 +185,73 @@ function fun() {
 }
 
 fun();
+```
+
+### 箭头函数懂吗？
+
+1. 特性
+
+箭头函数无需通过 `function` 去定义一个函数，通过括号 + 表达式的形式去定义
+语法是：当参数只有一个时，可以省略括号，当表达式也是单个时可以隐式的返回
+
+即：
+
+```js
+const fun = (a, b) => {
+  a + b;
+};
+```
+
+2. 不存在 `this` 指向的问题
+
+- 箭头函数自动继承外层作用域（静态绑定）
+
+这使得箭头函数在回调函数比如（setTimeout 或者 react事件处理）中非常有用
+
+```js
+function timer() {
+  this.seconds = 0;
+  //传统函数下：this指向的是调用者（可能出现this丢失）
+  setTimeout(function a() {
+    this.seconds++;
+  }, 1000);
+  //箭头函数下：this直接继承外部函数的实例
+  setTimeout(() => {
+    this.seconds++;
+  }, 1000);
+}
+```
+
+- 避免了在 `setTimeout`、事件处理函数、或者数组方法中 this 的指向问题
+
+```js
+// 普通函数需要额外通过 bind 绑定this
+button
+  .addListener("click", function () {
+    this.classList.toggle("active");
+  })
+  .bind(this);
+
+//箭头函数 自动继承外层函数示例
+button.addListener("click", () => {
+  this.classList.toggle("active");
+});
+```
+
+- 没有原型属性（prototype），所以无法作为对象的自身属性去访问
+
+```js
+const obj = {
+  a: 1,
+  b: () => this.a, //错误。，此时 this 指向全局对象
+};
+```
+
+- 箭头函数符合函数式编程的风格，提高代码可读性，维护性
+
+简化像 `map`、`filter`、`reduce`等针对数组的一些操作
+
+```js
+const nums = [1, 2, 3];
+const squera = nums.map(x => x * x);
 ```
