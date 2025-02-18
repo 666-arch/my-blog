@@ -310,6 +310,8 @@ const arr = Array.from(objToArray);
 
 - `Array.prototype.slice.call`
 
+通过数组原型 `Array.prototype.slice.call`
+
 ```js
 const objToArray = {
   0: "red",
@@ -319,3 +321,19 @@ const objToArray = {
 const arr = Array.prototype.slice.call(objToArray);
 // ['red', 'blue']
 ```
+
+### 原型和原型链？
+
+> 在 JS 中万物皆可以是对象，那么函数也是对象，原型也是对象，所有对象都存在 _proto_ 属性，而函数拥有特殊的 prototype 属性
+
+原型链的本质：
+
+本质其实就是通过 `_proto_` 属性像梯子一样逐级的向上查找，直到找到属性或者 `null`（最顶层的原型，原型链终点）
+
+原型和原型链之间就行 `DNA模型` 构造函数的 `prototype` 属性就像基因库，`_proto_` 就像继承基因
+
+在 JS `OOP` 面向对象编程思想中，本质就是通过原型委托机制，它不是复制各对象的属性，而是通过链条的形式建立各对象直接的引用连接。
+
+应用场景：
+
+- 可以实现方法继承，通过 类 和实例对象的继承关系，访问其内部被公开的方法
