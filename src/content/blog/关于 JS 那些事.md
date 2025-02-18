@@ -287,3 +287,35 @@ const squera = nums.map(x => x * x);
   - 在于 加锁和重置锁 `timer=setTimeout`、`timer = null`
 
 举例说明：节流可以比作等红绿灯，当绿灯触发到开启红灯这段事件，可以一次通过一批车辆
+
+### JS 类数组转换数组？
+
+什么是类数组？
+
+> 一个对象有 length 属性，并且可以通过索引访问元素，但是不具备纯数组的方法
+
+- `Array.from`
+
+最直接的方法就是通过 `Array.from` 的方式进行转换
+
+```js
+const objToArray = {
+  0: "apple",
+  1: "orange",
+  length: 2,
+};
+const arr = Array.from(objToArray);
+// ['apple', 'orange']
+```
+
+- `Array.prototype.slice.call`
+
+```js
+const objToArray = {
+  0: "red",
+  1: "blue",
+  length: 2,
+};
+const arr = Array.prototype.slice.call(objToArray);
+// ['red', 'blue']
+```
