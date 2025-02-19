@@ -424,3 +424,39 @@ Q1：为什么用WeakMap 而不是 Map
 > WeakMap是弱引用类型，能更好的处理GC机制，避免内存泄露
 
 > 更适合临时存储，深拷贝完成后，能自动清理临时数据
+
+### 你知道的 Promise 和 async/await ？
+
+1. `Promise` 是 Javascript 中处理 `异步` 操作的一个 `对象`
+
+2. 他有三种状态：
+
+- `pending` -> 初始化（未完成也未结束）状态
+- `fulfilled` -> 操作完成
+- `rejected` -> 操作失败
+
+3. 链式调用：通过 `then()`、`catch()`、`finally()` 处理结果，或者捕获异常，避免 `回调地狱`
+
+因为 `Promise` 实际上是一个函数对象，那么既然是函数对象，就存在自己的 `prototype` 属性
+而 then、catch、finally 都属于 prototype 的方法
+
+```js
+const fetchData = () => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      const num = Math.random();
+      num > 0.5 ? resolve("success") : reject("fail");
+    }, 1000);
+  });
+};
+fetchData()
+  .then(data => console.log(data))
+  .catch(error => console.log(error));
+```
+
+#### Q1：能详细说说 链式调用吗？
+
+> 根据上文所述，.then() 方法可以接收两个参数，一个是 Promise 成功兑现的回调函数，一个是 Promise 被拒绝的回调函数。
+> 但是 .then() 方法被执行后又会返回一个新生成的 Promise 对象，同样可以继续调用 .then 方法。这种现象就像 "俄罗斯" 套娃。
+> 但是每个 .then() 方法的处理对链式调用中的下游又非常重要，所以 .catch() 方法就是处理用于针对未被兑现的 Promise，并且这个
+> .catch() 方法最后式放在链式调用的最后去处理以保证整个链式的完整性
