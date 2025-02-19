@@ -398,24 +398,24 @@ console.log(deepCopy.nested.b); // 保持原值 -> 成功深拷贝
 手动实现一个深拷贝
 
 ```js
-function cloneDeep(source: any, map = new WeakMap()){
-  //基础的类型直接返回
-  if(typeof source !== 'object' || source === null) return source;
-  //处理循环引用，避免无效递归
-  if(map.has(source)) return map.get(source);
-  //动态创建副本，如果是数组 -> []
-  const target = Array.isArray(source) ? [] : {};
-  map.set(source, target)
-  //开始递归拷贝属性
-  for (const key in source) {
-    //根据key拷贝
-    if (source.hasOwnProperty(key)) {
-      //递归引用赋值
-      target[key] = cloneDeep(source[key], map);
+function cloneDeep(source: any, map = new WeakMap()) {
+    //基础的类型直接返回
+    if (typeof source !== 'object' || source === null) return source;
+    //处理循环引用，避免无效递归
+    if (map.has(source)) return map.get(source);
+    //动态创建副本，如果是数组 -> []
+    const target = Array.isArray(source) ? [] : {};
+    map.set(source, target)
+    //开始递归拷贝属性
+    for (const key in source) {
+        //根据key拷贝
+        if (source.hasOwnProperty(key)) {
+            //递归引用赋值
+            target[key] = cloneDeep(source[key], map);
+        }
     }
-  }
-  //返回递归完成后的新对象
-  return target;
+    //返回递归完成后的新对象
+    return target;
 }
 ```
 
@@ -484,11 +484,28 @@ const promise3 = new Promise((resolve, reject) => {
 const allPromise = Promise.all([promise1, promise2, promise3]).then(values => {
   console.log(values);
 });
+// [6, 36, 'foo']
 ```
 
 - Promise.allSettled()
 
 > 可传入多个可迭代的 Promise，当一个 Promise 被敲定（要么兑现，要么拒绝）都会返回
+
+```js
+const promise1 = Promise.resolve(1);
+const promise2 = new Promise((resolve, reject) => {
+  setTimeout(reject, 100, "foo");
+});
+
+const allSetPromise = [promise1, promise2];
+const result = Promise.allSettled(allSetPromise).then(values => {
+  console.log(values);
+});
+// [
+//   {status: 'fulfilled', value: 1},
+//   {status: 'rejected', reason: 'foo'}
+// ]
+```
 
 - Promise.any()
 
