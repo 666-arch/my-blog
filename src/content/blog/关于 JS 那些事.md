@@ -469,4 +469,19 @@ fetchData()
 
 > 原因很简单，Javascript 本质是 单线程，尽管控制权交给 多个不同的Promise做处理，但是本质上依然是一个任务会被执行。只是看起来是并发
 
-但是 Promise 也提供了 四种异步任务的并发
+但是 Promise 也提供了 四种静态方法 处理异步任务的并发
+
+- Promise.all()
+
+> 可传入多个可迭代的 Promise，并且如果有其中一个无法兑现，则全部无效
+
+- Promise.allSettled()
+
+> 可传入多个可迭代的 Promise，当一个 Promise 被敲定（要么兑现，要么拒绝）都会返回
+
+- Promise.any()
+
+> 当传入多个可迭代对象的 Promise，返回其中一个被兑现的值，并且返回第一个成功被兑现的值
+
+- Promise.race()
+  > 当传入多个可迭代对象的 Promise，也是返回一个，那个被兑现的快就返回哪个
