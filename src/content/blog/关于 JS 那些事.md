@@ -513,3 +513,17 @@ const result = Promise.allSettled(allSetPromise).then(values => {
 
 - Promise.race()
   > 当传入多个可迭代对象的 Promise，也是返回一个，那个被兑现的快就返回哪个
+
+```js
+const promise2 = new Promise((resolve, reject) => {
+  setTimeout(resolve, 200, "success1");
+});
+const promise3 = new Promise((resolve, reject) => {
+  setTimeout(resolve, 100, "success2");
+});
+const allSetPromise = [promise2, promise3];
+const allPromise = Promise.race(allSetPromise).then(values => {
+  console.log(values);
+});
+// success2
+```
