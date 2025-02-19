@@ -418,3 +418,9 @@ function cloneDeep(source: any, map = new WeakMap()){
   return target;
 }
 ```
+
+Q1：为什么用WeakMap 而不是 Map
+
+> WeakMap是弱引用类型，能更好的处理GC机制，避免内存泄露
+
+> 更适合临时存储，深拷贝完成后，能自动清理临时数据
