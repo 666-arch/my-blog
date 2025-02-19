@@ -337,3 +337,84 @@ const arr = Array.prototype.slice.call(objToArray);
 应用场景：
 
 - 可以实现方法继承，通过 类 和实例对象的继承关系，访问其内部被公开的方法
+
+### 浅拷贝 和 深拷贝？
+
+首先浅拷贝和深拷贝都是针对对象进行的复制，区别在复制的层级：
+
+|     特性     |          浅拷贝          |              深拷贝              |
+| :----------: | :----------------------: | :------------------------------: |
+|   复制层级   |     仅复制第一层属性     |      递归复制所有嵌套的属性      |
+| 引用类型处理 | 复制一份引用地址进行共享 | 创建出一个全新对象开辟一个新空间 |
+|   修改影响   | 修改嵌套对象会影响原属性 |    修改任何对象不会影响原属性    |
+
+#### 哪些方法可以实现 浅拷贝
+
+- 直接赋值（不是拷贝，只是引用的传递）
+
+```js
+const obj = { a: 1, nested: { b: 2 } };
+const _obj = obj; //只是引用的传递
+_obj.a = 999;
+console.log(obj.a); // 999 原对象被修改
+```
+
+- Object.assign()
+
+```js
+const obj = { a: 1, nested: { b: 2 } };
+const _obj = Object.assign({}, obj);
+_obj.nested.b = 999;
+console.log(obj.nested.b); // 999 浅拷贝陷阱
+```
+
+- 展开运算符
+
+```js
+const obj = { a: 1, nested: { b: 2 } };
+const _obj = { ...obj };
+_obj.nested.b = 666;
+console.log(_obj.nested.b); // 666 同样影响原对象
+```
+
+#### 哪些方法可以实现 深拷贝
+
+- JSON.parse(JSON.stringify()) 最快捷方式
+
+```js
+const obj = { a: 1, nested: { b: 2 } };
+const deepCopy = { ...obj };
+deepCopy.nested.b = 666;
+console.log(deepCopy.nested.b); // 保持原值 -> 成功深拷贝
+```
+
+但是这种方法存在局限性：
+
+- 丢失 undefined、function等类型
+- 日期对象会被转换为字符串
+
+使用第三方库 Lodash的 \_.cloneDeep 方法
+
+手动实现一个深拷贝
+
+```js
+function cloneDeep(source: any, map = new WeakMap()){
+  //基础的类型直接返回
+  if(typeof source !== 'object' || source === null) return source;
+  //处理循环引用，避免无效递归
+  if(map.has(source)) return map.get(source);
+  //动态创建副本，如果是数组 -> []
+  const target = Array.isArray(source) ? [] : {};
+  map.set(source, target)
+  //开始递归拷贝属性
+  for (const key in source) {
+    //根据key拷贝
+    if (source.hasOwnProperty(key)) {
+      //递归引用赋值
+      target[key] = cloneDeep(source[key], map);
+    }
+  }
+  //返回递归完成后的新对象
+  return target;
+}
+```
