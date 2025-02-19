@@ -475,6 +475,17 @@ fetchData()
 
 > 可传入多个可迭代的 Promise，并且如果有其中一个无法兑现，则全部无效
 
+```js
+const promise1 = Promise.resolve(6);
+const promise2 = 36;
+const promise3 = new Promise((resolve, reject) => {
+  setTimeout(resolve, 100, "foo");
+});
+const allPromise = Promise.all([promise1, promise2, promise3]).then(values => {
+  console.log(values);
+});
+```
+
 - Promise.allSettled()
 
 > 可传入多个可迭代的 Promise，当一个 Promise 被敲定（要么兑现，要么拒绝）都会返回
