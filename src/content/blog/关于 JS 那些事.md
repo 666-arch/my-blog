@@ -527,3 +527,37 @@ const allPromise = Promise.race(allSetPromise).then(values => {
 });
 // success2
 ```
+
+#### async 和 await呢？
+
+> 简单来说 他们是 Promise 的语法糖
+
+`async`
+
+绑定给已定的新的异步函数，函数体内可以使用 `await` 这让我们更加方便的处理 Promise，每次异步调用时，它都返回一个新的 Promise
+避免了显示的配置 Promise 链。
+
+可以通过 `async function` 表达式来定义异步函数
+
+```js
+const fun1 = () => {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      console.log("resolved");
+    }, 2000);
+  });
+};
+const fun2 = async () => {
+  const response = await fun1();
+  console.log(response); //resolved
+};
+fun2();
+```
+
+`await`
+
+await 就是等待的意思 仅在异步函数或者模块顶级中使用，无法在脱离 async情况下使用，它一般作用于 `函数体` 中
+
+> 异步函数体可以看作由零个 或者 多个 await 分割开来，也就是说从函数顶级到执行到第一个 await，此过程都是同步的运行的
+
+`await` 表达式后都会被认为跟着一个 `.then()` 的回调，根据这个特性，每个 Promise 链都可以根据情况进行 `链重构`
