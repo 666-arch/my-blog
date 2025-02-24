@@ -6,7 +6,7 @@ title: "关于 JS 那些事"
 featured: true
 draft: false
 tags:
-  - echarts
+  - Javascript
 description: "JS碎片化"
 ---
 
@@ -605,20 +605,40 @@ console.log(p === asyncReturn()); //false
 
 #### 切片分块上传
 
-```js
+```ts
 const splitFile = (file: File) => {
-  const chunkSize = 10 * 1024 * 1024; //定义每块小文件 10mb
-  let chunks = []; //定义小文件chunks
-  let startSize = 0; //初始化文件大小
+  const chunkSize = 5 * 1024 * 1024; //每块 10mb
+  let chunks = [];
+  let startSize = 0;
   while (startSize < file.size) {
-    //确保每块chunk不会大于总文件大小
     const end = Math.min(startSize + chunkSize, file.size);
-    //开始分割 file 并 转换为 Blob
-    chunks.push(file.slice(startSize, end))
-    //记录每次分割出来的重新对比
-    startSize = end
+    chunks.push(file.slice(startSize, end)); //开始分割 file 并 转换为 Blob
+    startSize = end;
   }
-  console.log(chunks); //[Blob, Blob, ...]
   return chunks;
+};
+
+const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const file: File | undefined = e.target.files?.[0];
+  const chunks = splitFile(file!);
+  const randomStr = Math.random().toString().slice(2, 7);
+  let tasks: Promise<void>[] = [];
+  chunks.map((chunk, index) => {
+    const data = new FormData();
+    data.set("name", randomStr + "_" + file?.name + "-" + index);
+    data.append("files", chunk);
+    tasks.push(axios.post("http://192.168.2.xxx:3001/user/upload", data));
+  });
+  await Promise.all(tasks);
+  await axios
+    .get(
+      "http://192.168.2.xxx:3001/user/merge?name=" +
+        randomStr +
+        "_" +
+        file?.name
+    )
+    .then(res => {
+      console.log("res", res);
+    });
 };
 ```
