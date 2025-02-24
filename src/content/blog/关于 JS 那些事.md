@@ -639,16 +639,20 @@ const splitFile = (file: File) => {
 const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
   const file: File | undefined = e.target.files?.[0];
   const chunks = splitFile(file!);
+  //防止文件名冲突
   const randomStr = Math.random().toString().slice(2, 7);
   let tasks: Promise<void>[] = [];
+  //循环整个文件
   chunks.map((chunk, index) => {
     const data = new FormData();
     data.set("name", randomStr + "_" + file?.name + "-" + index);
     data.append("files", chunk);
     tasks.push(axios.post("http://192.168.2.xxx:3001/user/upload", data));
   });
+  //并行上传
   await Promise.all(tasks);
-  await axios
+  //上传完毕后，执行文件合并操作，服务端会自动删除原来上传的切片再进行整合
+  axios
     .get(
       "http://192.168.2.xxx:3001/user/merge?name=" +
         randomStr +
