@@ -605,6 +605,14 @@ console.log(p === asyncReturn()); //false
 
 #### 切片分块上传
 
+假设一个100M 文件上传需要 2分钟，当一个文件很大是，比如 1G，这时候如果直接将整个文件上传就需要 20分钟，这种会造成用户体验会很不好。
+所以在大文件上传的场景下，需要做一些优化。
+
+比如把 1G 的文件，拆分成 10个 100M的小文件，然后这些文件通过并行的方式上传，等 10个 小文件上传完成后，
+再通过服务端文件合并的接口，将原来分片的文件进行整合成一个文件
+
+这就是大文件分片上传的方案
+
 ```ts
 const splitFile = (file: File) => {
   const chunkSize = 5 * 1024 * 1024; //每块 10mb
@@ -641,4 +649,50 @@ const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
       console.log("res", res);
     });
 };
+```
+
+后端代码（这里是 NestJs）
+
+```ts
+// 上传接口
+@Post('upload')
+@UseInterceptors(FilesInterceptor('files', 20, {
+  dest: 'uploads1'
+}))
+uploadFiles(@UploadedFiles() files: Array<Express.Multer.File>, @Body() body: { name: string }) {
+  console.log('body', body)
+  console.log('files', files)
+  const fileName = body.name.match(/(.+)\-\d+$/)[1];
+  const chunkDir = 'uploads1/chunks_' + fileName;
+  if (!fs.existsSync(chunkDir)) {
+    fs.mkdirSync(chunkDir);
+  }
+  fs.cpSync(files[0].path, chunkDir + '/' + body.name);
+  fs.rmSync(files[0].path);
+}
+
+// 合并
+@Get('merge')
+merage(@Query('name') name: string) {
+  const chunkDir = 'uploads1/chunks_' + name;
+  const files = fs.readdirSync(chunkDir);
+  let startPos = 0;
+  let count = 0;
+  files.map(file => {
+    const filePath = chunkDir + '/' + file;
+    const stream = fs.createReadStream(filePath);
+    stream.pipe(fs.createWriteStream('uploads1' + name, {
+      start: startPos
+    })).on('finish', () => {
+      count++;
+      if (count === files.length) {
+        fs.rm(chunkDir, {
+          recursive: true
+        }, () => {
+        });
+      }
+    })
+    startPos += fs.statSync(filePath).size;
+  })
+}
 ```
