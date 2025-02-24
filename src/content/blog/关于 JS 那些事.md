@@ -445,6 +445,7 @@ Q1：为什么用WeakMap 而不是 Map
 
 > 一般在进行计时、网络请求等操作时需要回调函数来处理最终结果，但是网络请求可能不止一个，那么可能会出现
 > A 完成执行后 执行 B，B 执行完后执行 C，开发者不得不将结果依赖进行嵌套，保证每个回调都能往下顺延。
+> 造成代码可读性差，维护性差，难以扩展和管理
 
 #### Q3：有哪些典型的回调地狱场景？
 
@@ -529,7 +530,8 @@ const result = Promise.allSettled(allSetPromise).then(values => {
 > 当传入多个可迭代对象的 Promise，返回其中一个被兑现的值，并且返回第一个成功被兑现的值
 
 - Promise.race()
-  > 当传入多个可迭代对象的 Promise，也是返回一个，那个被兑现的快就返回哪个
+
+> 当传入多个可迭代对象的 Promise，也是返回一个，那个被兑现的快就返回哪个
 
 ```js
 const promise2 = new Promise((resolve, reject) => {
@@ -599,4 +601,24 @@ console.log(p === basicReturn()); //true
 console.log(p === asyncReturn()); //false
 ```
 
-#### Q3：如何用 Promise 实现图片懒加载？
+### 你如何进行大文件的上传？
+
+#### 切片分块上传
+
+```js
+const splitFile = (file: File) => {
+  const chunkSize = 10 * 1024 * 1024; //定义每块小文件 10mb
+  let chunks = []; //定义小文件chunks
+  let startSize = 0; //初始化文件大小
+  while (startSize < file.size) {
+    //确保每块chunk不会大于总文件大小
+    const end = Math.min(startSize + chunkSize, file.size);
+    //开始分割 file 并 转换为 Blob
+    chunks.push(file.slice(startSize, end))
+    //记录每次分割出来的重新对比
+    startSize = end
+  }
+  console.log(chunks); //[Blob, Blob, ...]
+  return chunks;
+};
+```
