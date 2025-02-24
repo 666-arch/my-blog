@@ -613,14 +613,24 @@ console.log(p === asyncReturn()); //false
 
 这就是大文件分片上传的方案
 
+#### File 和 Blob
+
+> File是继承自Blob，或者说 File 可以通过调用 Blob 的特殊方法去将 File类型 的文件转换为 Blob的二进制流 文件然后再通过FormData的形式进行传输
+
+`Blob`内置了一个 `slice` 方法，它会创建并且返回一个新的 Blob对象，该对象包含了调用 blob 的子集，也就是说File类型文件可以通过 slice 方法
+将 File文件 转换为 blob的二进制流文件
+
 ```ts
 const splitFile = (file: File) => {
   const chunkSize = 5 * 1024 * 1024; //每块 10mb
-  let chunks = [];
-  let startSize = 0;
+  let chunks = []; //定义一个初始化的 chunks
+  let startSize = 0; //计算初始化的文件大小
   while (startSize < file.size) {
+    //确保分割出来的文件大小不会超过总文件
     const end = Math.min(startSize + chunkSize, file.size);
+    //将分割好的添加到 chunks 集合
     chunks.push(file.slice(startSize, end)); //开始分割 file 并 转换为 Blob
+    //累计每次最后添加的文件大小
     startSize = end;
   }
   return chunks;
