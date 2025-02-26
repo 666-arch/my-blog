@@ -88,7 +88,7 @@ function compnetn() {
   if (condtion) {
     const [state1, setState1] = useState(false); //第一次执行
   }
-  const [state2, setState2] = useState(true); ❌
+  const [state2, setState2] = useState(true); // ❌
 }
 ```
 
@@ -123,7 +123,9 @@ function Component({ items }) {
 - 父子组件
   - Props/回调函数
 - 兄弟组件
-  - 状态提升
+  - 状态提升：状态提升到共同父组件
   - Context
 - 跨层级组件
-  - redux、事件总线
+  - redux、事件总线（尽量不用，会破坏数据流可预测性）
+
+### React 的虚拟 DOM 如何提升性能？Diff 算法的大致原理？
