@@ -41,3 +41,6 @@ react 允许在组件中通过 `useState` 存储一些状态变量，这些状�
 #### 如何解决
 
 - 通过 `useEffect` 监听需要更新的状态值，通过依赖值，状态更新hou
+- 通过 函数式更新，使用 `setState(pre=> newValue)` 确保获取最新的值
+- 使用 `useRef` 捕获最新的值
+- 通过 `flushSync` 强制同步更新（不推荐）
