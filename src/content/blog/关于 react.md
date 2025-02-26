@@ -27,3 +27,17 @@ description: "react碎片化"
 - useState
 - useEffect
 - useRef
+
+#### useState
+
+react 允许在组件中通过 `useState` 存储一些状态变量，这些状态变量
+可以是基本的数据类型，也可以是复杂的数据类型
+
+#### 为什么状态更新不及时
+
+因为 `useState` 状态更新机制是异步的，并不能直接在代码下一行获取最新
+出于性能优化（批量更新机制）
+
+#### 如何解决
+
+- 通过 `useEffect` 监听需要更新的状态值，通过依赖值，状态更新hou
