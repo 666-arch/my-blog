@@ -117,3 +117,13 @@ function Component({ items }) {
 
 > 获取深层次的 `DOM` 结构进行其他操作，通常我都用它来绑定 hooks 结合 `useRef`
 > 一起使用，来针对一些 DOM 进行一些初始化 或者 判断该 DOM 是否渲染成功
+
+### React 组件如何通信？
+
+- 父子组件
+  - Props/回调函数
+- 兄弟组件
+  - 状态提升
+  - Context
+- 跨层级组件
+  - redux、事件总线
