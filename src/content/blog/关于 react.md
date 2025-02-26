@@ -78,18 +78,37 @@ react 允许在组件中通过 `useState` 存储一些状态变量，这些状�
 #### React Hooks 为什么不能在条件或循环中调用？
 
 > 首先，react 是通过 `链表结构` 来管理 `hooks` 的状态，会严格按照
-> 顺序依次执行被添加到 链表 的 hooks，保证状态的一致性
+> 顺序依次执行被添加到 链表 的 hooks，保证状态的一致性，
+> 条件/循环语句会破坏 react hooks 调用顺序的稳定性
 
-例如：
+1. 例如在条件语句中：
 
 ```js
 function compnetn() {
   if (condtion) {
     const [state1, setState1] = useState(false); //第一次执行
   }
-  const [state2, setState2] = useState(true);
+  const [state2, setState2] = useState(true); ❌
 }
 ```
 
 上述代码中，当 state1 hook 第一次 false 被执行，if语句变为 true时，
 react 会认为把 state2 还是当作第一次执行，这样容易造成数据错乱
+
+2. 例如在循环语句中：
+
+```js
+function Component({ items }) {
+  for (let i = 0; i < items.length; i++) {
+    const [state, setState] = useState(null); // ❌ 循环次数变化时，Hooks 数量会改变
+  }
+}
+```
+
+上述代码中，for循环会尝试多个 hooks，每循环一次，hooks 数量就会发生变化，显然会造成诸多不确定性。
+
+3. React报错机制不允许我们这样使用
+
+在条件、循环、嵌套函数中使用 hooks，会直接抛出错误如下错误：
+
+`React Hook "useState" is called conditionally. React Hooks must be called in the exact same order in every component render.`
