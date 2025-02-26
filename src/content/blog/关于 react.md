@@ -112,3 +112,8 @@ function Component({ items }) {
 在条件、循环、嵌套函数中使用 hooks，会直接抛出错误如下错误：
 
 `React Hook "useState" is called conditionally. React Hooks must be called in the exact same order in every component render.`
+
+### react 中 ref 是干什么用的，有哪些使用场景？
+
+> 获取深层次的 `DOM` 结构进行其他操作，通常我都用它来绑定 hooks 结合 `useRef`
+> 一起使用，来针对一些 DOM 进行一些初始化 或者 判断该 DOM 是否渲染成功
