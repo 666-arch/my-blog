@@ -221,3 +221,10 @@ function App() {
 算法能深层优先遍历节点。
 
 在调度机制上，它利用了 `浏览器空闲机制` 然后在这段时间去分片的去执行任务吗，并且确保主线程任务不被阻塞。
+
+### React 19 了解过吗？有什么新特性？
+
+好像新增了几个 hooks
+
+- useActionStatus：处理异步 pending、error、data的一些状态
+- useFormStatus：追踪表单提交的状态？
