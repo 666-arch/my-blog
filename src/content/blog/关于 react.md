@@ -142,11 +142,34 @@ function Component({ items }) {
 
 `arePropsEqual` 也是一个函数，接收两个参数，一个是旧的 `props`，
 一个是新的 `props`，不需要特别指定，默认情况下 它内部会通过 `Object.is` 进行
-浅比较每个 prop。
+浅比较每个 `prop`
+
+父组件：
+
+```tsx
+function Parent() {
+  const [num, setNum] = useState(0);
+  return (
+    <>
+      <Chrilden num={num} />
+      <div onClick={() => setNum(1)}>这是父组件 {num}</div>
+    </>
+  );
+}
+```
+
+子组件：
+
+```tsx
+const Chrilden = React.memo(function Chrilden({ num }) {
+  console.log("Chrilden was rendered at", num);
+  return <h3>这是子组件 {num}</h3>;
+});
+```
 
 2. 代码分割，React.lazy + suspense 动态加载组件
 
-使用 `React.lazy` 按需导入组件
+#### 使用 `React.lazy` 按需导入组件
 
 ```jsx
 const MyComponent = React.lazy(() => import("./MyComponent"));
