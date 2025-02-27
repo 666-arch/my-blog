@@ -136,7 +136,7 @@ function Component({ items }) {
    - useMemo 缓存计算结果
    - useCallback 缓存函数引用
 
-#### memo
+#### memo 记忆组件
 
 实际上 `memo` 接收两个参数，一个是包裹的组件，一个是 `arePropsEqual`。
 
