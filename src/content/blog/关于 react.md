@@ -195,3 +195,13 @@ function App() {
 注意：`Suspense` 只能用于包裹被懒加载的组件，不能包裹普通组件
 
 3. 虚拟化长列表，使用 react-window 或者 react-virtualized 实现虚拟滚动
+
+### 如何实现受控表单组件？
+
+> 通过表单的 `value` 属性结合 `useState` 以及 `onChange` 控制表单的输入
+> 来使得它成为一个受控制的组件
+
+### 非受控表单的使用场景？
+
+> 非受控组件通过 `ref` 来绑定 `DOM` 使用 `current.value` 属性来提交表单值
+> 适合文件上传或者无需进行数据验证的场景
