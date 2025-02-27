@@ -128,4 +128,37 @@ function Component({ items }) {
 - 跨层级组件
   - redux、事件总线（尽量不用，会破坏数据流可预测性）
 
-### React 的虚拟 DOM 如何提升性能？Diff 算法的大致原理？
+### 如何优化 React 性能？
+
+1. 组件缓存
+
+   - React.memo 缓存函数组件，避免无意义渲染
+   - useMemo 缓存计算结果
+   - useCallback 缓存函数引用
+
+2. 代码分割，React.lazy + suspense 动态加载组件
+
+使用 `React.lazy` 按需导入组件
+
+```jsx
+const MyComponent = React.lazy(() => import("./MyComponent"));
+```
+
+使用 `Suspense`包裹懒加载组件
+
+```jsx
+import React, { Suspense } from "react";
+function App() {
+  return (
+    <div>
+      <Suspense fallback={<div>Loading...</div>}>
+        <MyComponent />
+      </Suspense>
+    </div>
+  );
+}
+```
+
+注意：`Suspense` 只能用于包裹被懒加载的组件，不能包裹普通组件
+
+3. 虚拟化长列表，使用 react-window 或者 react-virtualized 实现虚拟滚动
