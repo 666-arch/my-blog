@@ -135,6 +135,8 @@ function Component({ items }) {
    - React.memo 缓存函数组件，避免无意义渲染
    - useMemo 缓存计算结果
    - useCallback 缓存函数引用
+   - 使用 `useDebounce` 对值及事件处理函数进行防抖，避免状态频繁变动，优化渲染次数
+   - 使用 `react-query` 对请求响应进行缓存、重发等，避免多次请求，减少网络 IO 消耗及优化渲染次数
 
 #### memo 记忆组件
 
