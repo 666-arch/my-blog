@@ -59,3 +59,26 @@ description: "http碎片化"
 
 - 强缓存：浏览器直接使用本地缓存
 - 协商缓存：与服务器通信向服务器请求资源是否变更，未变更 `304 Not Modified` 使用本地缓存
+
+#### `强缓存`
+
+需要通过服务器设置 `Cache-Control` 并且设置为公开，设置 `max-age` 过期时间
+
+#### NestJS
+
+```ts
+@Get('cached')
+@Header('Cache-Control', 'public, max-age=10') // 缓存 10s
+getCachedData() {
+  return {
+    data: 'This is cached data (强制缓存生效)',
+    timestamp: new Date().toISOString(),
+  };
+}
+```
+
+浏览器在进行 `http` 请求时 会在 `Headers` 中携带 `Cache-Control`
+
+`Cache-Control: public, max-age=10`
+
+> 上述代码中，如果浏览器在 `10s` 内再次发送 http 请求，会从浏览器中直接读取第一期请求的缓存，不会发送到服务器
