@@ -82,3 +82,5 @@ getCachedData() {
 `Cache-Control: public, max-age=10`
 
 > 上述代码中，如果浏览器在 `10s` 内再次发送 http 请求，会从浏览器中直接读取第一期请求的缓存，不会发送到服务器
+
+`协商缓存`
