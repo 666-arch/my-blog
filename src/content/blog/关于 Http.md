@@ -83,4 +83,21 @@ getCachedData() {
 
 > 上述代码中，如果浏览器在 `10s` 内再次发送 http 请求，会从浏览器中直接读取第一期请求的缓存，不会发送到服务器
 
-`协商缓存`
+`协商缓存（ETag）`
+
+#### NestJS
+
+```ts
+@Get('etag')
+getEtag(@Req() req: Request, @Res() res: Response){
+  const clientEtag = req.headers['if-none-match'];
+  // 对比 ETag
+  if (clientEtag === this.etag) {
+    return res.status(304).end(); // 资源未修改
+  }
+
+  // 返回新内容并设置 ETag
+  res.setHeader('ETag', this.etag);
+  res.send(this.data);
+}
+```
