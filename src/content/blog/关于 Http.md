@@ -101,3 +101,5 @@ getEtag(@Req() req: Request, @Res() res: Response){
   res.send(this.data);
 }
 ```
+
+### Http方法 Get 和 Post？
