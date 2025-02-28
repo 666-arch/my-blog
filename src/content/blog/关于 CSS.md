@@ -6,7 +6,7 @@ title: "关于 CSS 那些事"
 featured: true
 draft: false
 tags:
-  - http
+  - css
 description: "CSS碎片化"
 ---
 
