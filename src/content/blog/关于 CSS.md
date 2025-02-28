@@ -37,3 +37,21 @@ description: "CSS碎片化"
    - 通过 flex 布局替代浮动布局，减少布局的复杂度，避免浮动塌陷情况
 3. 虚拟列表
    - 暂时只将浏览器可视区域渲染出来，减少DOM节点的增加和删除
+
+### 如何实现一个虚拟列表？
+
+通过 `react-window`
+
+```jsx
+import { FixedSizeList as VirtualList } from "react-window";
+const App = () => (
+  <VirtualList
+    height={600}
+    itemCount={1000}
+    itemSize={50} // 固定高度
+    width={300}
+  >
+    {({ index, style }) => <div style={style}>Item {index}</div>}
+  </VirtualList>
+);
+```
