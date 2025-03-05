@@ -38,3 +38,25 @@ description: "typescript碎片化"
 - 使用 `泛型` 替代
 
 ### `interface` 和 `type` 区别？
+
+> interface 可通过 `extend` 关键字实现继承操作，对象类型优先使用哦 `interface` 便于更好的扩展
+
+> type 可以定义联合类型（A | B）和 交叉类型（A & B）用来合并属性
+
+```ts
+type Admin = User & { permissions: string[] }; //合并属性
+```
+
+### 泛型是什么？作用？
+
+我的理解就是泛指很多个类型 就是泛型。最大的作用避免了过度使用 `any`，可以在你不确定类型的时候去使用它，你可以在 类、函数、接口的参数类型中
+去定义一个泛型。这一也可以提高类型的安全性
+
+```ts
+function identity<T>(arg: T): T {
+  return arg;
+}
+//使用
+const num = identity<number>(66); //显式的指定类型
+const str = identity("str"); //自动类型推断为 string
+```
