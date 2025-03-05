@@ -60,3 +60,11 @@ function identity<T>(arg: T): T {
 const num = identity<number>(66); //显式的指定类型
 const str = identity("str"); //自动类型推断为 string
 ```
+
+### 你这么处理第三方TS类型缺少定义的情况？
+
+在 `src` 目录下的 `.d.ts` 中通过 `declare` 关键字 声明该模块，例如“
+
+```ts
+declare module "type-lib";
+```
