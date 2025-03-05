@@ -63,8 +63,14 @@ const str = identity("str"); //自动类型推断为 string
 
 ### 你这么处理第三方TS类型缺少定义的情况？
 
+#### 第一种方式：
+
 在 `src` 目录下的 `.d.ts` 中通过 `declare` 关键字 声明该模块，例如“
 
 ```ts
 declare module "type-lib";
 ```
+
+#### 第二种方式：
+
+在 `tsconfig.json` 关键配置项中配置
