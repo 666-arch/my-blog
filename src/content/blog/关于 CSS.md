@@ -55,3 +55,5 @@ const App = () => (
   </VirtualList>
 );
 ```
+
+### 如何理解BFC？
